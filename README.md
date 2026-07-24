@@ -41,10 +41,12 @@ Run the full daily scan (screener + engine) and update the dashboard's data file
 ```
 
 **Daily workflow is automated** via a Windows Scheduled Task
-(`HolyGrailDailyScan`, runs `scripts/daily_run.ps1` daily at 6:00 PM local
-time — only while your PC is on and you're logged in). It runs the scan,
-and pushes `docs/data/signals.json` only if something changed. Logs land in
-`logs/run_*.log`. Manage the task with:
+(`HolyGrailDailyScan`, runs `scripts/daily_run.ps1` at 9:00 AM and 6:00 PM
+local time — only while your PC is on and you're logged in). It runs the
+scan and pushes `docs/data/signals.json` only if something changed. The
+9 AM run is provisional (today's daily candle is still forming, so signals
+can differ from end of day); the 6 PM run reflects the final close. Logs
+land in `logs/run_*.log`. Manage the task with:
 
 ```powershell
 Get-ScheduledTask -TaskName HolyGrailDailyScan          # check status

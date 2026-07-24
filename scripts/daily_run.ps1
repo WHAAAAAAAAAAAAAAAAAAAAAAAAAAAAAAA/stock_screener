@@ -1,7 +1,8 @@
-# Runs the daily Holy Grail scan and publishes updated signals to the live
+# Runs the Holy Grail scan and publishes updated signals to the live
 # dashboard (git commit + push -> GitHub Pages republishes automatically).
-# Invoked by the "HolyGrailDailyScan" Windows Scheduled Task; safe to run
-# by hand too.
+# Invoked by the "HolyGrailDailyScan" Windows Scheduled Task at 9:00 AM
+# (early/provisional read, mid-day candle) and 6:00 PM (stable, after-close
+# read) local time; safe to run by hand too.
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path -Parent $PSScriptRoot
