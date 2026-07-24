@@ -68,7 +68,9 @@ cd docs && "../.venv/Scripts/python.exe" -m http.server 8000
 - [x] Stage C — Finviz-equivalent screener (`holy_grail/screener.py`, `universe.py`)
 - [x] Stage D — daily scan orchestrator (`holy_grail/scan.py` → `docs/data/signals.json`)
 - [x] Stage E — dashboard (`docs/index.html`, static, no build step)
-- [ ] Stage F — public GitHub repo + Pages hosting (source runs locally, on demand)
+- [x] Stage F — public GitHub repo + Pages hosting (source runs locally, on demand)
+
+Live dashboard: https://whaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.github.io/stock_screener/
 
 ## Known approximations vs. the live Pine script
 
