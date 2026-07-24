@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Holy Grail Signals</title>
+<style>
+  :root {
+    --bg: #0b0d12;
+    --panel: #12151c;
+    --border: #232833;
+    --text: #e6e9ef;
+    --muted: #8b93a3;
+    --bull: #2ecc71;
+    --bear: #e05a5a;
+    --warn: #e0a83c;
+    --accent: #5bc8f5;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f4f6fa;
+      --panel: #ffffff;
+      --border: #dfe4ec;
+      --text: #1a1e27;
+      --muted: #5b6472;
+      --bull: #1e9e56;
+      --bear: #c0392b;
+      --warn: #b5790a;
+      --accent: #0f7fb5;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    padding: 24px;
+  }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  .meta { color: var(--muted); font-size: 0.85rem; margin-bottom: 20px; }
+  .summary {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    min-width: 140px;
+  }
+  .card .n { font-size: 1.5rem; font-weight: 600; }
+  .card .l { color: var(--muted); font-size: 0.8rem; }
+  .feed {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  .feed h2 { margin: 0 0 10px; font-size: 1rem; }
+  .feed-item { padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+  .feed-item:last-child { border-bottom: none; }
+  .feed-empty { color: var(--muted); font-size: 0.9rem; }
+  .table-wrap {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow-x: auto;
+  }
+  table { border-collapse: collapse; width: 100%; font-size: 0.85rem; white-space: nowrap; }
+  th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+  th {
+    position: sticky; top: 0;
+    background: var(--panel);
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    user-select: none;
+  }
+  th:hover { color: var(--accent); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(127,127,127,0.06); }
+  .ticker { font-weight: 700; }
+  .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .bull { color: var(--bull); }
+  .bear { color: var(--bear); }
+  .pill.long { background: rgba(46,204,113,0.15); color: var(--bull); }
+  .pill.short { background: rgba(224,90,90,0.15); color: var(--bear); }
+  .pill.flat { background: rgba(139,147,163,0.15); color: var(--muted); }
+  .pill.exit { background: rgba(224,168,60,0.15); color: var(--warn); }
+  .dim { color: var(--muted); }
+  .empty-state { padding: 40px; text-align: center; color: var(--muted); }
+</style>
+</head>
+<body>
+  <h1>Holy Grail Signals</h1>
+  <div class="meta" id="meta">Loading...</div>
+
+  <div class="summary" id="summary"></div>
+
+  <div class="feed">
+    <h2>Fired today</h2>
+    <div id="feed"></div>
+  </div>
+
+  <div class="table-wrap">
+    <table id="table">
+      <thead>
+        <tr>
+          <th data-key="ticker">Ticker</th>
+          <th data-key="price">Price</th>
+          <th data-key="trade_status">Status</th>
+          <th data-key="trend200">Trend200</th>
+          <th data-key="weekly_state">Weekly</th>
+          <th data-key="ema_cloud_state">EMA21/50</th>
+          <th data-key="macd_state">MACD</th>
+          <th data-key="adx">ADX</th>
+          <th data-key="rsi">RSI</th>
+          <th data-key="stoch_k">Stoch%K</th>
+          <th data-key="bb_squeeze">Squeeze</th>
+          <th data-key="stop_price">Stop</th>
+          <th data-key="signal_count">Sig Against</th>
+          <th data-key="market_cap">Mkt Cap</th>
+          <th data-key="avg_volume">Avg Vol</th>
+          <th data-key="relative_volume">Rel Vol</th>
+          <th data-key="beta">Beta</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="empty-state" id="empty" style="display:none">No tickers currently pass the screener.</div>
+  </div>
+
+<script>
+let DATA = null;
+let SORT_KEY = "ticker";
+let SORT_DIR = 1;
+
+function fmtNum(x, digits) {
+  if (x === null || x === undefined) return "—";
+  return Number(x).toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: 0 });
+}
+function fmtCap(x) {
+  if (x === null || x === undefined) return "—";
+  if (x >= 1e12) return (x / 1e12).toFixed(2) + "T";
+  if (x >= 1e9) return (x / 1e9).toFixed(2) + "B";
+  if (x >= 1e6) return (x / 1e6).toFixed(1) + "M";
+  return fmtNum(x, 0);
+}
+function bullBear(state) {
+  if (!state) return '<span class="dim">—</span>';
+  const cls = state === "BULL" ? "bull" : "bear";
+  return `<span class="${cls}">${state === "BULL" ? "▲" : "▼"} ${state}</span>`;
+}
+function statusPill(status) {
+  let cls = "flat";
+  if (status === "LONG LIVE") cls = "long";
+  else if (status === "SHORT LIVE") cls = "short";
+  else if (status !== "FLAT") cls = "exit";
+  return `<span class="pill ${cls}">${status}</span>`;
+}
+
+function render() {
+  const rows = [...DATA.signals].sort((a, b) => {
+    const av = a[SORT_KEY], bv = b[SORT_KEY];
+    if (av === null) return 1;
+    if (bv === null) return -1;
+    if (typeof av === "string") return av.localeCompare(bv) * SORT_DIR;
+    return (av - bv) * SORT_DIR;
+  });
+
+  document.getElementById("meta").textContent =
+    `Generated ${new Date(DATA.generated_at).toLocaleString()} — ${DATA.screener_pass_count} / ${DATA.universe_size} passed the screener`;
+
+  document.getElementById("summary").innerHTML = `
+    <div class="card"><div class="n">${DATA.screener_pass_count}</div><div class="l">Screener pass</div></div>
+    <div class="card"><div class="n">${rows.filter(r => r.trade_status === "LONG LIVE").length}</div><div class="l">Long live</div></div>
+    <div class="card"><div class="n">${rows.filter(r => r.trade_status === "SHORT LIVE").length}</div><div class="l">Short live</div></div>
+    <div class="card"><div class="n">${rows.filter(r => r.entered_long_today || r.entered_short_today).length}</div><div class="l">New entries today</div></div>
+  `;
+
+  const fired = rows.filter(r => r.entered_long_today || r.entered_short_today || r.exited_today);
+  const feedEl = document.getElementById("feed");
+  feedEl.innerHTML = fired.length
+    ? fired.map(r => {
+        const what = r.entered_long_today ? "entered LONG"
+          : r.entered_short_today ? "entered SHORT"
+          : "exited (" + r.trade_status + ")";
+        return `<div class="feed-item"><span class="ticker">${r.ticker}</span> — ${what} @ ${fmtNum(r.price, 2)}</div>`;
+      }).join("")
+    : '<div class="feed-empty">No entries or exits fired on the latest bar.</div>';
+
+  const tbody = document.getElementById("tbody");
+  document.getElementById("empty").style.display = rows.length ? "none" : "block";
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td class="ticker">${r.ticker}</td>
+      <td>${fmtNum(r.price, 2)}</td>
+      <td>${statusPill(r.trade_status)}</td>
+      <td>${bullBear(r.trend200)}</td>
+      <td>${r.weekly_warming_up ? '<span class="dim">warming up</span>' : bullBear(r.weekly_state)}</td>
+      <td>${bullBear(r.ema_cloud_state)}</td>
+      <td>${bullBear(r.macd_state)}</td>
+      <td>${fmtNum(r.adx, 1)}</td>
+      <td>${fmtNum(r.rsi, 1)}</td>
+      <td>${fmtNum(r.stoch_k, 1)}</td>
+      <td>${r.bb_squeeze ? "coiling" : "—"}</td>
+      <td>${fmtNum(r.stop_price, 2)}</td>
+      <td>${r.signal_count} / 4</td>
+      <td>${fmtCap(r.market_cap)}</td>
+      <td>${fmtCap(r.avg_volume)}</td>
+      <td>${fmtNum(r.relative_volume, 2)}</td>
+      <td>${fmtNum(r.beta, 2)}</td>
+    </tr>
+  `).join("");
+}
+
+document.querySelectorAll("th[data-key]").forEach(th => {
+  th.addEventListener("click", () => {
+    const key = th.dataset.key;
+    SORT_DIR = (SORT_KEY === key) ? -SORT_DIR : 1;
+    SORT_KEY = key;
+    render();
+  });
+});
+
+fetch("data/signals.json")
+  .then(r => r.json())
+  .then(data => { DATA = data; render(); })
+  .catch(err => {
+    document.getElementById("meta").textContent = "Failed to load signals.json: " + err;
+  });
+</script>
+</body>
+</html>
