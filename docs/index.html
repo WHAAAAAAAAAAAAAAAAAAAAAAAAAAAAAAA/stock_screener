@@ -103,6 +103,19 @@
   .pill.exit { background: rgba(224,168,60,0.15); color: var(--warn); }
   .dim { color: var(--muted); }
   .empty-state { padding: 40px; text-align: center; color: var(--muted); }
+  .section-note { color: var(--muted); font-size: 0.8rem; margin: -4px 0 12px; }
+  .readiness {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .readiness.r4 { background: rgba(46,204,113,0.20); color: var(--bull); }
+  .readiness.r3 { background: rgba(224,168,60,0.18); color: var(--warn); }
+  .readiness.r2, .readiness.r1, .readiness.r0 { background: rgba(139,147,163,0.15); color: var(--muted); }
+  .cond-yes { color: var(--bull); }
+  .cond-no { color: var(--muted); opacity: 0.5; }
 </style>
 </head>
 <body>
@@ -116,6 +129,30 @@
     <div id="feed"></div>
   </div>
 
+  <h2 style="font-size:1.1rem; margin: 0 0 4px;">Setting up for LONG</h2>
+  <div class="section-note">Not in a trade yet — ranked by how many of the bullish conditions are already true, so the next actual trigger (crossover / breakout / squeeze-fire / pullback) is more likely to fire clean. A live LONG/SHORT position below has already triggered and isn't a fresh opportunity.</div>
+  <div class="table-wrap" style="margin-bottom:20px;">
+    <table id="setup-table">
+      <thead>
+        <tr>
+          <th data-key="long_readiness" data-tbl="setup">Ready</th>
+          <th data-key="ticker" data-tbl="setup">Ticker</th>
+          <th data-key="price" data-tbl="setup">Price</th>
+          <th data-tbl="setup">Weekly</th>
+          <th data-tbl="setup">Trend</th>
+          <th data-tbl="setup">MACD</th>
+          <th data-tbl="setup">RSI zone</th>
+          <th data-key="rsi" data-tbl="setup">RSI</th>
+          <th data-key="adx" data-tbl="setup">ADX</th>
+          <th data-key="bb_squeeze" data-tbl="setup">Squeeze</th>
+        </tr>
+      </thead>
+      <tbody id="setup-tbody"></tbody>
+    </table>
+    <div class="empty-state" id="setup-empty" style="display:none">No flat tickers with bullish conditions lining up right now.</div>
+  </div>
+
+  <h2 style="font-size:1.1rem; margin: 0 0 10px;">All screened tickers</h2>
   <div class="table-wrap">
     <table id="table">
       <thead>
@@ -148,6 +185,8 @@
 let DATA = null;
 let SORT_KEY = "ticker";
 let SORT_DIR = 1;
+let SETUP_SORT_KEY = "long_readiness";
+let SETUP_SORT_DIR = -1;
 
 function fmtNum(x, digits) {
   if (x === null || x === undefined) return "—";
@@ -172,6 +211,9 @@ function statusPill(status) {
   else if (status !== "FLAT") cls = "exit";
   return `<span class="pill ${cls}">${status}</span>`;
 }
+function cond(yes, label) {
+  return `<span class="${yes ? 'cond-yes' : 'cond-no'}">${yes ? '✓' : '—'} ${label}</span>`;
+}
 
 function render() {
   const rows = [...DATA.signals].sort((a, b) => {
@@ -185,10 +227,12 @@ function render() {
   document.getElementById("meta").textContent =
     `Generated ${new Date(DATA.generated_at).toLocaleString()} — ${DATA.screener_pass_count} / ${DATA.universe_size} passed the screener`;
 
+  const notLive = rows.filter(r => r.trade_status !== "LONG LIVE" && r.trade_status !== "SHORT LIVE");
   document.getElementById("summary").innerHTML = `
     <div class="card"><div class="n">${DATA.screener_pass_count}</div><div class="l">Screener pass</div></div>
     <div class="card"><div class="n">${rows.filter(r => r.trade_status === "LONG LIVE").length}</div><div class="l">Long live</div></div>
     <div class="card"><div class="n">${rows.filter(r => r.trade_status === "SHORT LIVE").length}</div><div class="l">Short live</div></div>
+    <div class="card"><div class="n">${notLive.filter(r => r.long_readiness >= 3).length}</div><div class="l">Setting up (3+/4)</div></div>
     <div class="card"><div class="n">${rows.filter(r => r.entered_long_today || r.entered_short_today).length}</div><div class="l">New entries today</div></div>
   `;
 
@@ -226,9 +270,42 @@ function render() {
       <td>${fmtNum(r.beta, 2)}</td>
     </tr>
   `).join("");
+
+  const setupRows = rows
+    .filter(r => r.trade_status !== "LONG LIVE" && r.trade_status !== "SHORT LIVE" && r.long_readiness > 0)
+    .sort((a, b) => {
+      const av = a[SETUP_SORT_KEY], bv = b[SETUP_SORT_KEY];
+      if (typeof av === "string") return av.localeCompare(bv) * SETUP_SORT_DIR;
+      return (av - bv) * SETUP_SORT_DIR;
+    });
+  const setupTbody = document.getElementById("setup-tbody");
+  document.getElementById("setup-empty").style.display = setupRows.length ? "none" : "block";
+  setupTbody.innerHTML = setupRows.map(r => `
+    <tr>
+      <td><span class="readiness r${r.long_readiness}">${r.long_readiness} / 4</span></td>
+      <td class="ticker">${r.ticker}</td>
+      <td>${fmtNum(r.price, 2)}</td>
+      <td>${cond(r.long_conditions.weekly_bull, "weekly")}</td>
+      <td>${cond(r.long_conditions.trend_bull, "trend")}</td>
+      <td>${cond(r.long_conditions.macd_bull, "macd")}</td>
+      <td>${cond(r.long_conditions.rsi_in_zone, "rsi")}</td>
+      <td>${fmtNum(r.rsi, 1)}</td>
+      <td>${fmtNum(r.adx, 1)}</td>
+      <td>${r.bb_squeeze ? "coiling" : "—"}</td>
+    </tr>
+  `).join("");
 }
 
-document.querySelectorAll("th[data-key]").forEach(th => {
+document.querySelectorAll("th[data-key][data-tbl='setup']").forEach(th => {
+  th.addEventListener("click", () => {
+    const key = th.dataset.key;
+    SETUP_SORT_DIR = (SETUP_SORT_KEY === key) ? -SETUP_SORT_DIR : -1;
+    SETUP_SORT_KEY = key;
+    render();
+  });
+});
+
+document.querySelectorAll("th[data-key]:not([data-tbl])").forEach(th => {
   th.addEventListener("click", () => {
     const key = th.dataset.key;
     SORT_DIR = (SORT_KEY === key) ? -SORT_DIR : 1;

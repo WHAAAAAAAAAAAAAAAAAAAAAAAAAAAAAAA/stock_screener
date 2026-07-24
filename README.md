@@ -28,7 +28,7 @@ Backtest one or more tickers over history:
 
 Trade logs land in `backtest_output/*.csv`, equity curve in `backtest_output/*.png`.
 
-Run the Finviz-equivalent screener (defaults to the S&P 500 universe):
+Run the Finviz-equivalent screener (defaults to the full US market: NASDAQ + NYSE common stocks):
 
 ```bash
 .venv/Scripts/python -m holy_grail.screener
@@ -40,7 +40,19 @@ Run the full daily scan (screener + engine) and update the dashboard's data file
 .venv/Scripts/python -m holy_grail.scan
 ```
 
-**Daily workflow (run on your own machine):**
+**Daily workflow is automated** via a Windows Scheduled Task
+(`HolyGrailDailyScan`, runs `scripts/daily_run.ps1` daily at 6:00 PM local
+time — only while your PC is on and you're logged in). It runs the scan,
+and pushes `docs/data/signals.json` only if something changed. Logs land in
+`logs/run_*.log`. Manage the task with:
+
+```powershell
+Get-ScheduledTask -TaskName HolyGrailDailyScan          # check status
+Start-ScheduledTask -TaskName HolyGrailDailyScan        # run it right now
+Disable-ScheduledTask -TaskName HolyGrailDailyScan      # pause it
+```
+
+To run it by hand instead:
 
 ```bash
 .venv/Scripts/python -m holy_grail.scan

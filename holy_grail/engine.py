@@ -133,6 +133,17 @@ class HolyGrailEngine:
         macd_long = (not p.require_macd) | (macd_hist > 0)
         macd_short = (not p.require_macd) | (macd_hist < 0)
 
+        # Raw (toggle-independent) versions of the same conditions, for
+        # scoring how "set up" a currently-flat ticker is for a future
+        # entry - regardless of whether that filter is actually required
+        # to gate a real entry right now.
+        weekly_bull_raw = weekly_ema.notna() & (c > weekly_ema)
+        weekly_bear_raw = weekly_ema.notna() & (c < weekly_ema)
+        trend_bull_raw = (c > ema_slow) & (ema_fast > ema_slow)
+        trend_bear_raw = (c < ema_slow) & (ema_fast < ema_slow)
+        macd_bull_raw = macd_hist > 0
+        macd_bear_raw = macd_hist < 0
+
         # signal sources
         long_ema_cross = p.use_ema_cross & ta.crossover(ema_fast, ema_slow)
         short_ema_cross = p.use_ema_cross & ta.crossunder(ema_fast, ema_slow)
@@ -652,6 +663,14 @@ class HolyGrailEngine:
         result["sqz_dir"] = sqz_dir
         result["bear_div_active"] = bear_div_active
         result["bull_div_active"] = bull_div_active
+        result["weekly_bull_raw"] = weekly_bull_raw
+        result["weekly_bear_raw"] = weekly_bear_raw
+        result["trend_bull_raw"] = trend_bull_raw
+        result["trend_bear_raw"] = trend_bear_raw
+        result["macd_bull_raw"] = macd_bull_raw
+        result["macd_bear_raw"] = macd_bear_raw
+        result["rsi_good_long"] = rsi_good_long
+        result["rsi_good_short"] = rsi_good_short
         for key, arr in out.items():
             result[key] = arr
         for key, arr in out_bool.items():

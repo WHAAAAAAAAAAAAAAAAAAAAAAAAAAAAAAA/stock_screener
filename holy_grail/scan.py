@@ -3,7 +3,8 @@ Daily orchestrator: run the Finviz-equivalent screener, then run the
 HolyGrailEngine on every ticker that passes it, and write the combined
 result to docs/data/signals.json for the static dashboard to read.
 
-This is the one script meant to run on a schedule (Stage F: GitHub Actions).
+This is the script the "HolyGrailDailyScan" Windows Scheduled Task runs
+once a day (see scripts/daily_run.ps1).
 """
 from __future__ import annotations
 
@@ -47,6 +48,24 @@ def _ticker_signal(ticker: str, screener_row: pd.Series, engine: HolyGrailEngine
     row = result.iloc[-1]
     date = result.index[-1]
 
+    # "Setting up" score: how many of the bullish/bearish entry conditions
+    # are already true right now, independent of whether an actual entry
+    # signal (crossover/breakout/squeeze-fire/etc.) has fired yet. Only
+    # meaningful for a FLAT ticker - a LONG LIVE / SHORT LIVE ticker already
+    # entered, so "readiness" doesn't apply to it.
+    long_conditions = {
+        "weekly_bull": bool(row["weekly_bull_raw"]),
+        "trend_bull": bool(row["trend_bull_raw"]),
+        "macd_bull": bool(row["macd_bull_raw"]),
+        "rsi_in_zone": bool(row["rsi_good_long"]),
+    }
+    short_conditions = {
+        "weekly_bear": bool(row["weekly_bear_raw"]),
+        "trend_bear": bool(row["trend_bear_raw"]),
+        "macd_bear": bool(row["macd_bear_raw"]),
+        "rsi_in_zone": bool(row["rsi_good_short"]),
+    }
+
     return {
         "ticker": ticker,
         "as_of": date.date().isoformat(),
@@ -75,6 +94,10 @@ def _ticker_signal(ticker: str, screener_row: pd.Series, engine: HolyGrailEngine
         "entered_long_today": bool(row["enter_long"]),
         "entered_short_today": bool(row["enter_short"]),
         "exited_today": bool(row["exit_event"]) or bool(row["is_flip_long"]) or bool(row["is_flip_short"]),
+        "long_readiness": sum(long_conditions.values()),
+        "long_conditions": long_conditions,
+        "short_readiness": sum(short_conditions.values()),
+        "short_conditions": short_conditions,
     }
 
 
@@ -104,7 +127,7 @@ def run_scan(tickers: list[str] | None = None, period: str = "3y") -> dict:
 
 def main():
     parser = argparse.ArgumentParser(description="Run the daily Holy Grail scan.")
-    parser.add_argument("--tickers", nargs="*", default=None, help="Override universe (default: S&P 500)")
+    parser.add_argument("--tickers", nargs="*", default=None, help="Override universe (default: full market)")
     parser.add_argument("--period", default="3y", help="History window for the engine (default 3y)")
     parser.add_argument("--out", default=str(OUTPUT_PATH), help="Output JSON path")
     args = parser.parse_args()

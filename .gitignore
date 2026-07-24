@@ -2,3 +2,7 @@
 __pycache__/
 *.pyc
 backtest_output/
+universe_full_market.csv
+market_cap_cache.csv
+logs/
+.claude/

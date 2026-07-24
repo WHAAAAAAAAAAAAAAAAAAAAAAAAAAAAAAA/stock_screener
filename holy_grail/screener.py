@@ -13,21 +13,32 @@ the saved screen, matched exactly):
 
 No Finviz API needed (free tier has none) - computed from bulk yfinance
 OHLCV history plus a lightweight per-ticker market-cap lookup.
+
+Market cap is fetched FIRST for the whole universe (cheap, one field, and
+cached to disk for a week) so the expensive part - full price history +
+technicals - only runs on tickers that already clear the market-cap floor.
+That's what makes scanning the full market (thousands of tickers) practical
+instead of just the S&P 500.
 """
 from __future__ import annotations
 
+import math
 import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
+from datetime import datetime, timezone
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import yfinance as yf
 
 from . import indicators as ta
-from .universe import get_sp500_tickers
+from .universe import get_full_market_tickers
 
 SPY = "SPY"
+MARKET_CAP_CACHE_PATH = Path(__file__).resolve().parent.parent / "market_cap_cache.csv"
+MARKET_CAP_CACHE_MAX_AGE_DAYS = 7
 
 
 @dataclass
@@ -44,7 +55,7 @@ class ScreenerParams:
 
 
 def _bulk_history(tickers: list[str], period: str = "18mo", retries: int = 3) -> dict[str, pd.DataFrame]:
-    """One batched yfinance call for the whole universe (+SPY), not N calls."""
+    """One batched yfinance call for the whole (already narrowed) universe (+SPY)."""
     all_tickers = list(dict.fromkeys(tickers + [SPY]))
 
     raw = None
@@ -71,7 +82,21 @@ def _bulk_history(tickers: list[str], period: str = "18mo", retries: int = 3) ->
     return out
 
 
-def _fetch_market_caps(tickers: list[str], max_workers: int = 8, retries: int = 3) -> dict[str, float]:
+def _load_market_cap_cache() -> dict[str, tuple[float, str]]:
+    if not MARKET_CAP_CACHE_PATH.exists():
+        return {}
+    df = pd.read_csv(MARKET_CAP_CACHE_PATH)
+    return {row.ticker: (row.market_cap, row.fetched_at) for row in df.itertuples()}
+
+
+def _save_market_cap_cache(cache: dict[str, tuple[float, str]]) -> None:
+    df = pd.DataFrame(
+        [{"ticker": t, "market_cap": cap, "fetched_at": fetched_at} for t, (cap, fetched_at) in cache.items()]
+    )
+    df.to_csv(MARKET_CAP_CACHE_PATH, index=False)
+
+
+def _fetch_market_caps_network(tickers: list[str], max_workers: int = 12, retries: int = 3) -> dict[str, float]:
     def _one(t: str):
         for attempt in range(retries):
             try:
@@ -82,11 +107,45 @@ def _fetch_market_caps(tickers: list[str], max_workers: int = 8, retries: int = 
         return t, None
 
     caps: dict[str, float] = {}
+    done = 0
     with ThreadPoolExecutor(max_workers=max_workers) as pool:
         for t, cap in pool.map(_one, tickers):
+            done += 1
             if cap:
                 caps[t] = float(cap)
+            if done % 500 == 0:
+                print(f"  market cap fetch progress: {done} / {len(tickers)}")
     return caps
+
+
+def get_market_caps(
+    tickers: list[str], cache_max_age_days: int = MARKET_CAP_CACHE_MAX_AGE_DAYS, max_workers: int = 12
+) -> dict[str, float]:
+    cache = _load_market_cap_cache()
+    now = datetime.now(timezone.utc)
+
+    fresh: dict[str, float] = {}
+    to_fetch: list[str] = []
+    for t in tickers:
+        cached = cache.get(t)
+        if cached is not None:
+            cap, fetched_at = cached
+            if not (isinstance(cap, float) and math.isnan(cap)):
+                age_days = (now - datetime.fromisoformat(fetched_at)).days
+                if age_days <= cache_max_age_days:
+                    fresh[t] = cap
+                    continue
+        to_fetch.append(t)
+
+    print(f"Market cap: {len(fresh)} from cache, fetching {len(to_fetch)} fresh...")
+    if to_fetch:
+        newly_fetched = _fetch_market_caps_network(to_fetch, max_workers=max_workers)
+        for t, cap in newly_fetched.items():
+            cache[t] = (cap, now.isoformat())
+        _save_market_cap_cache(cache)
+        fresh.update(newly_fetched)
+
+    return fresh
 
 
 def _beta(returns: pd.Series, spy_returns: pd.Series) -> float:
@@ -102,19 +161,21 @@ def _beta(returns: pd.Series, spy_returns: pd.Series) -> float:
 
 def run_screener(tickers: list[str] | None = None, params: ScreenerParams | None = None) -> pd.DataFrame:
     p = params or ScreenerParams()
-    tickers = tickers or get_sp500_tickers()
+    tickers = tickers or get_full_market_tickers()
 
-    print(f"Downloading history for {len(tickers)} tickers + SPY...")
-    history = _bulk_history(tickers)
+    print(f"Screening {len(tickers)} tickers. Checking market cap first (cheap + cached)...")
+    market_caps = get_market_caps(tickers)
+    qualified = [t for t, cap in market_caps.items() if cap >= p.min_market_cap]
+    print(f"{len(qualified)} / {len(tickers)} clear the ${p.min_market_cap/1e9:.0f}B market-cap floor.")
+
+    print(f"Downloading price history for {len(qualified)} tickers + SPY...")
+    history = _bulk_history(qualified)
     if SPY not in history:
         raise RuntimeError("Failed to download SPY history (needed for beta) - aborting screener run.")
     spy_returns = history[SPY]["close"].pct_change()
 
-    print(f"Fetching market cap for {len(tickers)} tickers...")
-    market_caps = _fetch_market_caps([t for t in tickers if t in history])
-
     rows = []
-    for t in tickers:
+    for t in qualified:
         df = history.get(t)
         if df is None or len(df) < 200:
             continue
@@ -156,15 +217,19 @@ def run_screener(tickers: list[str] | None = None, params: ScreenerParams | None
             }
         )
 
-    result = pd.DataFrame(rows).set_index("ticker")
-    return result.sort_values("pass_all", ascending=False)
+    result = pd.DataFrame(rows).set_index("ticker") if rows else pd.DataFrame(
+        columns=["price", "market_cap", "avg_volume", "relative_volume", "beta", "sma50", "sma200", "rsi", "pass_all"]
+    )
+    if "pass_all" in result.columns:
+        result = result.sort_values("pass_all", ascending=False)
+    return result
 
 
 def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Run the Finviz-equivalent screener.")
-    parser.add_argument("--tickers", nargs="*", default=None, help="Override universe (default: S&P 500)")
+    parser.add_argument("--tickers", nargs="*", default=None, help="Override universe (default: full market)")
     args = parser.parse_args()
 
     result = run_screener(args.tickers)
