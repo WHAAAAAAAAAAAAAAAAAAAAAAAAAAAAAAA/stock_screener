@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import math
 import time
+import zlib
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -96,7 +97,22 @@ def _save_market_cap_cache(cache: dict[str, tuple[float, str]]) -> None:
     df.to_csv(MARKET_CAP_CACHE_PATH, index=False)
 
 
-def _fetch_market_caps_network(tickers: list[str], max_workers: int = 12, retries: int = 3) -> dict[str, float]:
+def _staleness_jitter_days(ticker: str, spread_days: int = 4) -> int:
+    """
+    Deterministic per-ticker jitter (0..spread_days-1) added to the cache
+    staleness window. Without this, a big batch fetched all at once (e.g.
+    the first full-market run) all expires at the same moment too, forcing
+    a full slow refetch of the entire universe in one shot every ~7 days
+    instead of a small rolling top-up. Uses crc32, not Python's built-in
+    hash(), since str hashing is randomized per-process by default.
+    """
+    return zlib.crc32(ticker.encode()) % spread_days
+
+
+def _fetch_market_caps_network(
+    tickers: list[str], cache: dict[str, tuple[float, str]], max_workers: int = 12, retries: int = 3,
+    save_every: int = 500,
+) -> dict[str, float]:
     def _one(t: str):
         for attempt in range(retries):
             try:
@@ -113,8 +129,10 @@ def _fetch_market_caps_network(tickers: list[str], max_workers: int = 12, retrie
             done += 1
             if cap:
                 caps[t] = float(cap)
-            if done % 500 == 0:
+                cache[t] = (float(cap), datetime.now(timezone.utc).isoformat())
+            if done % save_every == 0:
                 print(f"  market cap fetch progress: {done} / {len(tickers)}")
+                _save_market_cap_cache(cache)  # incremental checkpoint - survives an interrupted run
     return caps
 
 
@@ -131,18 +149,17 @@ def get_market_caps(
         if cached is not None:
             cap, fetched_at = cached
             if not (isinstance(cap, float) and math.isnan(cap)):
+                effective_max_age = cache_max_age_days + _staleness_jitter_days(t)
                 age_days = (now - datetime.fromisoformat(fetched_at)).days
-                if age_days <= cache_max_age_days:
+                if age_days <= effective_max_age:
                     fresh[t] = cap
                     continue
         to_fetch.append(t)
 
     print(f"Market cap: {len(fresh)} from cache, fetching {len(to_fetch)} fresh...")
     if to_fetch:
-        newly_fetched = _fetch_market_caps_network(to_fetch, max_workers=max_workers)
-        for t, cap in newly_fetched.items():
-            cache[t] = (cap, now.isoformat())
-        _save_market_cap_cache(cache)
+        newly_fetched = _fetch_market_caps_network(to_fetch, cache, max_workers=max_workers)
+        _save_market_cap_cache(cache)  # final save, in case the last batch was smaller than save_every
         fresh.update(newly_fetched)
 
     return fresh
