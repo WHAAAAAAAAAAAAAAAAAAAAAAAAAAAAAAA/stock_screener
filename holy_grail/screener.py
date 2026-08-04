@@ -1,12 +1,12 @@
 """
-Python replica of your saved Finviz "holy grail" screen (all 8 filters from
-the saved screen, matched exactly):
+Python replica of your saved Finviz "holy grail" screen, tuned since for
+more stable/reliable names (see ScreenerParams):
 
     Market Cap        +Large (over $10B)
     Price             over $10
-    Average Volume    500K to 1M
+    Average Volume    over 500K (no ceiling - lets mega-caps like AAPL through)
     Relative Volume   over 0.5
-    Beta              under 2
+    Beta              under 1.2 (tightened from the original <2 for stability)
     50-Day SMA        price above SMA50
     200-Day SMA       price above SMA200
     RSI (14)          not oversold (>40)
@@ -47,9 +47,9 @@ class ScreenerParams:
     min_market_cap: float = 10e9
     min_price: float = 10.0
     avg_vol_min: float = 500_000
-    avg_vol_max: float = 1_000_000
+    avg_vol_max: float = float("inf")
     min_relative_volume: float = 0.5
-    max_beta: float = 2.0
+    max_beta: float = 1.2
     require_above_sma50: bool = True
     require_above_sma200: bool = True
     min_rsi: float = 40.0
