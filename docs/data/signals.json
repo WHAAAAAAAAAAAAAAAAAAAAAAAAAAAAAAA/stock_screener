@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-25T22:40:27.542247+00:00",
+  "generated_at": "2026-08-25T23:01:38.968640+00:00",
   "universe_size": 856,
   "screener_pass_count": 271,
   "signals": [
@@ -6403,7 +6403,7 @@
       "ticker": "PAYC",
       "as_of": "2026-08-25",
       "price": 231.6999969482422,
-      "market_cap": 10443093984.752335,
+      "market_cap": 10443093984.752337,
       "avg_volume": 940889.0,
       "relative_volume": 0.5126077571318189,
       "beta": 0.7469639987714575,
