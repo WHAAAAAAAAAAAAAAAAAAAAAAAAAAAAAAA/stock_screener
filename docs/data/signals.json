@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-05T14:27:53.804436+00:00",
+  "generated_at": "2026-09-05T23:01:12.345344+00:00",
   "universe_size": 848,
   "screener_pass_count": 217,
   "signals": [
@@ -6198,7 +6198,7 @@
       "ticker": "SPGI",
       "as_of": "2026-09-04",
       "price": 443.510009765625,
-      "market_cap": 130746750878.90625,
+      "market_cap": 130746750878.90623,
       "avg_volume": 2203429.015873016,
       "relative_volume": 0.6921484599746652,
       "beta": 0.6505310984978379,
