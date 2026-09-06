@@ -2,7 +2,7 @@
 Python replica of your saved Finviz "holy grail" screen, tuned since for
 more stable/reliable names (see ScreenerParams):
 
-    Market Cap        +Large (over $10B)
+    Market Cap        Mega-cap (over $100B - household names only)
     Price             over $10
     Average Volume    over 500K (no ceiling - lets mega-caps like AAPL through)
     Relative Volume   over 0.5
@@ -44,7 +44,7 @@ MARKET_CAP_CACHE_MAX_AGE_DAYS = 7
 
 @dataclass
 class ScreenerParams:
-    min_market_cap: float = 10e9
+    min_market_cap: float = 100e9
     min_price: float = 10.0
     avg_vol_min: float = 500_000
     avg_vol_max: float = float("inf")

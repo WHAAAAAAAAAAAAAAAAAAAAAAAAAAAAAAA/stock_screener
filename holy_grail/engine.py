@@ -44,7 +44,11 @@ class HolyGrailParams:
     require_trend: bool = True
     require_macd: bool = False
     require_weekly: bool = True
-    use_adx_filter: bool = False
+    # Enabled (Pine default is off) - blocks entries when ADX shows chop
+    # rather than a real trend. Backtested across two different large-cap
+    # name sets it was the single change that flipped expectancy positive,
+    # and it lengthens the average hold toward the multi-week range.
+    use_adx_filter: bool = True
     adx_min_level: float = 20.0
     rsi_min_long: float = 40
     rsi_max_short: float = 60

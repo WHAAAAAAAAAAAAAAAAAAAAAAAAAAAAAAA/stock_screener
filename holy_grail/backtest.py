@@ -33,6 +33,12 @@ def extract_trades(ticker: str, result: pd.DataFrame) -> pd.DataFrame:
                 "time_exit" if row["time_exit"] else
                 "flip"
             )
+            exit_price = row["close"]
+            pct_gain = (
+                (exit_price - open_price) / open_price * 100.0
+                if open_dir == "long"
+                else (open_price - exit_price) / open_price * 100.0
+            )
             trades.append(
                 {
                     "ticker": ticker,
@@ -40,7 +46,8 @@ def extract_trades(ticker: str, result: pd.DataFrame) -> pd.DataFrame:
                     "entry_date": open_date,
                     "entry_price": open_price,
                     "exit_date": date,
-                    "exit_price": row["close"],
+                    "exit_price": exit_price,
+                    "pct_gain": pct_gain,
                     "r_multiple": row["current_r"],
                     "exit_reason": reason,
                     "bars_held": idx - open_idx,
@@ -78,6 +85,12 @@ def summarize(trades: pd.DataFrame) -> dict:
         "total_r": trades["r_multiple"].sum(),
         "max_drawdown_r": drawdown.min(),
         "avg_bars_held": trades["bars_held"].mean(),
+        "median_bars_held": trades["bars_held"].median(),
+        "avg_pct": trades["pct_gain"].mean(),
+        "avg_win_pct": wins["pct_gain"].mean() if len(wins) else float("nan"),
+        "avg_loss_pct": losses["pct_gain"].mean() if len(losses) else float("nan"),
+        "pct_hit_10": (trades["pct_gain"] >= 10).mean() * 100,
+        "pct_hit_20": (trades["pct_gain"] >= 20).mean() * 100,
     }
 
 
@@ -156,6 +169,12 @@ def main():
         f"n={s['n_trades']}  win%={s['win_rate']*100:.1f}  avgR={s['avg_r']:+.2f}  "
         f"avgWinR={s['avg_win_r']:+.2f}  avgLossR={s['avg_loss_r']:+.2f}  "
         f"totalR={s['total_r']:+.2f}  maxDD={s['max_drawdown_r']:+.2f}"
+    )
+    print(
+        f"Holding period: avg {s['avg_bars_held']:.1f} trading days, median {s['median_bars_held']:.0f}\n"
+        f"Per-trade return: avg {s['avg_pct']:+.1f}%, winners avg {s['avg_win_pct']:+.1f}%, "
+        f"losers avg {s['avg_loss_pct']:+.1f}%\n"
+        f"Trades reaching +10%: {s['pct_hit_10']:.1f}%   reaching +20%: {s['pct_hit_20']:.1f}%"
     )
 
     png_path = OUTPUT_DIR / f"equity_{tag}.png"
