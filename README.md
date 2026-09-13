@@ -28,7 +28,9 @@ Backtest one or more tickers over history:
 
 Trade logs land in `backtest_output/*.csv`, equity curve in `backtest_output/*.png`.
 
-Run the Finviz-equivalent screener (defaults to the full US market: NASDAQ + NYSE common stocks):
+Run the Finviz-equivalent screener (defaults to S&P 500 members over $100B —
+US-domiciled household names; the full-market list is still available via
+`universe.get_full_market_tickers()`):
 
 ```bash
 .venv/Scripts/python -m holy_grail.screener

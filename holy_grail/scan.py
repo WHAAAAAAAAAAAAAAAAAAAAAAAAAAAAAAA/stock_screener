@@ -16,8 +16,14 @@ from pathlib import Path
 
 import pandas as pd
 
+from .backtest import extract_trades
 from .engine import HolyGrailEngine, load_daily
 from .screener import run_screener
+
+# A closed trade this close to flat is neither a win nor a loss - usually a
+# break-even stop-out, which the engine's BE ratchet produces by design.
+FLAT_TRADE_PCT = 0.5
+TRACK_RECORD_MONTHS = 12
 
 OUTPUT_PATH = Path(__file__).resolve().parent.parent / "docs" / "data" / "signals.json"
 
@@ -34,7 +40,9 @@ def _clean(value):
     return value
 
 
-def _ticker_signal(ticker: str, screener_row: pd.Series, engine: HolyGrailEngine, period: str) -> dict | None:
+def _ticker_signal(
+    ticker: str, screener_row: pd.Series, engine: HolyGrailEngine, period: str
+) -> tuple[dict, pd.DataFrame] | None:
     try:
         data = load_daily(ticker, period=period)
     except Exception as exc:
@@ -47,6 +55,29 @@ def _ticker_signal(ticker: str, screener_row: pd.Series, engine: HolyGrailEngine
     result = engine.run(data)
     row = result.iloc[-1]
     date = result.index[-1]
+
+    # Full closed-trade history for this ticker, reusing the backtester's
+    # reconstruction so the dashboard and the backtest always agree on what
+    # counts as a trade and what it returned.
+    trades = extract_trades(ticker, result, verbose=False)
+
+    # If a position closed on the latest bar, surface what that trade did:
+    # what it was bought at, sold at, and the resulting P/L.
+    closed_today = None
+    if not trades.empty:
+        todays = trades[trades["exit_date"] == date]
+        if not todays.empty:
+            t = todays.iloc[-1]
+            closed_today = {
+                "direction": t["direction"],
+                "entry_date": t["entry_date"].date().isoformat(),
+                "entry_price": _clean(round(float(t["entry_price"]), 2)),
+                "exit_price": _clean(round(float(t["exit_price"]), 2)),
+                "pct_gain": _clean(round(float(t["pct_gain"]), 2)),
+                "r_multiple": _clean(round(float(t["r_multiple"]), 2)),
+                "exit_reason": t["exit_reason"],
+                "bars_held": int(t["bars_held"]),
+            }
 
     # "Setting up" score: how many of the bullish/bearish entry conditions
     # are already true right now, independent of whether an actual entry
@@ -66,7 +97,7 @@ def _ticker_signal(ticker: str, screener_row: pd.Series, engine: HolyGrailEngine
         "rsi_in_zone": bool(row["rsi_good_short"]),
     }
 
-    return {
+    signal = {
         "ticker": ticker,
         "as_of": date.date().isoformat(),
         "price": _clean(screener_row["price"]),
@@ -98,7 +129,9 @@ def _ticker_signal(ticker: str, screener_row: pd.Series, engine: HolyGrailEngine
         "long_conditions": long_conditions,
         "short_readiness": sum(short_conditions.values()),
         "short_conditions": short_conditions,
+        "closed_today": closed_today,
     }
+    return signal, trades
 
 
 def run_scan(tickers: list[str] | None = None, period: str = "3y") -> dict:
@@ -109,11 +142,15 @@ def run_scan(tickers: list[str] | None = None, period: str = "3y") -> dict:
 
     engine = HolyGrailEngine()
     signals = []
+    all_trades = []
     print("Running Holy Grail engine on screener survivors...")
     for ticker, row in passed.iterrows():
-        sig = _ticker_signal(ticker, row, engine, period)
-        if sig is not None:
+        out = _ticker_signal(ticker, row, engine, period)
+        if out is not None:
+            sig, trades = out
             signals.append(sig)
+            if not trades.empty:
+                all_trades.append(trades)
 
     signals.sort(key=lambda s: (s["trade_status"] not in ("LONG LIVE", "SHORT LIVE"), s["ticker"]))
 
@@ -121,7 +158,44 @@ def run_scan(tickers: list[str] | None = None, period: str = "3y") -> dict:
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "universe_size": len(screener_result),
         "screener_pass_count": len(passed),
+        "track_record": _track_record(all_trades),
         "signals": signals,
+    }
+
+
+def _track_record(all_trades: list[pd.DataFrame]) -> dict:
+    """
+    Win / loss / flat counts over the trailing window, across every ticker
+    currently on the dashboard.
+
+    NOTE: these are the signals the engine WOULD have produced on the
+    currently-screened tickers - not a record of trades actually taken.
+    The screened list changes over time, so this is strategy performance,
+    not a personal P/L statement. The dashboard labels it that way.
+    """
+    empty = {"wins": 0, "losses": 0, "flat": 0, "total": 0, "win_rate": None,
+             "avg_pct": None, "months": TRACK_RECORD_MONTHS}
+    if not all_trades:
+        return empty
+
+    trades = pd.concat(all_trades, ignore_index=True)
+    cutoff = pd.Timestamp.now() - pd.DateOffset(months=TRACK_RECORD_MONTHS)
+    trades = trades[trades["exit_date"] >= cutoff]
+    if trades.empty:
+        return empty
+
+    flat = trades["pct_gain"].abs() < FLAT_TRADE_PCT
+    wins = (trades["pct_gain"] >= FLAT_TRADE_PCT).sum()
+    losses = (trades["pct_gain"] <= -FLAT_TRADE_PCT).sum()
+    decided = wins + losses
+    return {
+        "wins": int(wins),
+        "losses": int(losses),
+        "flat": int(flat.sum()),
+        "total": int(len(trades)),
+        "win_rate": round(float(wins / decided * 100), 1) if decided else None,
+        "avg_pct": round(float(trades["pct_gain"].mean()), 2),
+        "months": TRACK_RECORD_MONTHS,
     }
 
 

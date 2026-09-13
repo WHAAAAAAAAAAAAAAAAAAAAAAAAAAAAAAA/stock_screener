@@ -2,7 +2,11 @@
 Python replica of your saved Finviz "holy grail" screen, tuned since for
 more stable/reliable names (see ScreenerParams):
 
-    Market Cap        Mega-cap (over $100B - household names only)
+    Universe          S&P 500 members only - US-domiciled household names.
+                      (The full-market list kept surfacing huge foreign
+                      ADRs like MUFG/HSBC/BBVA/PBR that pass a $100B cap
+                      filter but aren't names a US trader recognizes.)
+    Market Cap        Mega-cap (over $100B)
     Price             over $10
     Average Volume    over 500K (no ceiling - lets mega-caps like AAPL through)
     Relative Volume   over 0.5
@@ -35,7 +39,7 @@ import pandas as pd
 import yfinance as yf
 
 from . import indicators as ta
-from .universe import get_full_market_tickers
+from .universe import get_sp500_tickers
 
 SPY = "SPY"
 MARKET_CAP_CACHE_PATH = Path(__file__).resolve().parent.parent / "market_cap_cache.csv"
@@ -178,7 +182,7 @@ def _beta(returns: pd.Series, spy_returns: pd.Series) -> float:
 
 def run_screener(tickers: list[str] | None = None, params: ScreenerParams | None = None) -> pd.DataFrame:
     p = params or ScreenerParams()
-    tickers = tickers or get_full_market_tickers()
+    tickers = tickers or get_sp500_tickers()
 
     print(f"Screening {len(tickers)} tickers. Checking market cap first (cheap + cached)...")
     market_caps = get_market_caps(tickers)

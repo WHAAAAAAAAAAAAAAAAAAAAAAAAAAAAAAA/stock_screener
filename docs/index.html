@@ -62,9 +62,34 @@
     margin-bottom: 20px;
   }
   .feed h2 { margin: 0 0 10px; font-size: 1rem; }
-  .feed-item { padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+  .feed-item { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
   .feed-item:last-child { border-bottom: none; }
   .feed-empty { color: var(--muted); font-size: 0.9rem; }
+  .trade-detail {
+    margin-top: 3px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+  }
+  .trade-detail b { color: var(--text); font-weight: 600; }
+  .pl-pos { color: var(--bull); font-weight: 700; }
+  .pl-neg { color: var(--bear); font-weight: 700; }
+  .pl-flat { color: var(--muted); font-weight: 700; }
+  .record-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .record-legend { font-size: 0.8rem; line-height: 1.6; }
+  .record-legend .dot {
+    display: inline-block;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+  .record-note { color: var(--muted); font-size: 0.72rem; margin-top: 6px; max-width: 210px; }
   .table-wrap {
     background: var(--panel);
     border: 1px solid var(--border);
@@ -121,6 +146,8 @@
 <body>
   <h1>Holy Grail Signals</h1>
   <div class="meta" id="meta">Loading...</div>
+
+  <div class="summary" id="record"></div>
 
   <div class="summary" id="summary"></div>
 
@@ -211,6 +238,51 @@ function statusPill(status) {
   else if (status !== "FLAT") cls = "exit";
   return `<span class="pill ${cls}">${status}</span>`;
 }
+function renderRecord(rec) {
+  const el = document.getElementById("record");
+  if (!rec || !rec.total) {
+    el.innerHTML = '<div class="card"><div class="l">No closed trades in the tracking window yet.</div></div>';
+    return;
+  }
+  const { wins, losses, flat, total, win_rate, avg_pct, months } = rec;
+
+  // Donut: three arcs sized by share of total, drawn on one circle.
+  const R = 42, C = 2 * Math.PI * R;
+  const seg = (n, color, offset) =>
+    `<circle cx="60" cy="60" r="${R}" fill="none" stroke="${color}" stroke-width="16"
+       stroke-dasharray="${(n / total) * C} ${C}" stroke-dashoffset="${-offset}"
+       transform="rotate(-90 60 60)"></circle>`;
+
+  const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const green = cssVar("--bull"), red = cssVar("--bear"), grey = cssVar("--muted");
+
+  el.innerHTML = `
+    <div class="card record-card">
+      <svg width="120" height="120" viewBox="0 0 120 120" role="img"
+           aria-label="${wins} wins, ${losses} losses, ${flat} flat out of ${total} trades">
+        <circle cx="60" cy="60" r="${R}" fill="none" stroke="${grey}" stroke-width="16" opacity="0.15"></circle>
+        ${seg(wins, green, 0)}
+        ${seg(losses, red, (wins / total) * C)}
+        ${seg(flat, grey, ((wins + losses) / total) * C)}
+        <text x="60" y="55" text-anchor="middle" font-size="21" font-weight="700"
+              fill="${cssVar("--text")}">${win_rate === null ? "—" : win_rate + "%"}</text>
+        <text x="60" y="73" text-anchor="middle" font-size="10" fill="${grey}">win rate</text>
+      </svg>
+      <div>
+        <div class="record-legend">
+          <div><span class="dot" style="background:${green}"></span><b>${wins}</b> won</div>
+          <div><span class="dot" style="background:${red}"></span><b>${losses}</b> lost</div>
+          <div><span class="dot" style="background:${grey}"></span><b>${flat}</b> flat (±0.5%)</div>
+        </div>
+        <div class="record-note">
+          ${total} closed trades, last ${months} months, avg ${avg_pct >= 0 ? "+" : ""}${avg_pct}% per trade.
+          Signals on today's screened names — not trades actually taken.
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function cond(yes, label) {
   return `<span class="${yes ? 'cond-yes' : 'cond-no'}">${yes ? '✓' : '—'} ${label}</span>`;
 }
@@ -236,6 +308,8 @@ function render() {
     <div class="card"><div class="n">${rows.filter(r => r.entered_long_today || r.entered_short_today).length}</div><div class="l">New entries today</div></div>
   `;
 
+  renderRecord(DATA.track_record);
+
   const fired = rows.filter(r => r.entered_long_today || r.entered_short_today || r.exited_today);
   const feedEl = document.getElementById("feed");
   feedEl.innerHTML = fired.length
@@ -243,7 +317,23 @@ function render() {
         const what = r.entered_long_today ? "entered LONG"
           : r.entered_short_today ? "entered SHORT"
           : "exited (" + r.trade_status + ")";
-        return `<div class="feed-item"><span class="ticker">${r.ticker}</span> — ${what} @ ${fmtNum(r.price, 2)}</div>`;
+        const ct = r.closed_today;
+        // For an exit the buy/sell prices are on the detail line below, so
+        // repeating today's price in the header just duplicates it.
+        let line = `<div class="feed-item"><span class="ticker">${r.ticker}</span> — ${what}`;
+        if (!ct) line += ` @ ${fmtNum(r.price, 2)}`;
+        if (ct) {
+          const plCls = ct.pct_gain > 0.5 ? "pl-pos" : ct.pct_gain < -0.5 ? "pl-neg" : "pl-flat";
+          const sign = ct.pct_gain > 0 ? "+" : "";
+          line += `<div class="trade-detail">
+            <span>bought <b>${fmtNum(ct.entry_price, 2)}</b> on ${ct.entry_date}</span>
+            <span>sold <b>${fmtNum(ct.exit_price, 2)}</b></span>
+            <span>P/L <span class="${plCls}">${sign}${fmtNum(ct.pct_gain, 2)}%</span></span>
+            <span>held ${ct.bars_held} days</span>
+            <span>${ct.exit_reason.replace(/_/g, " ")}</span>
+          </div>`;
+        }
+        return line + "</div>";
       }).join("")
     : '<div class="feed-empty">No entries or exits fired on the latest bar.</div>';
 

@@ -19,7 +19,7 @@ from .engine import HolyGrailEngine, HolyGrailParams, load_daily
 OUTPUT_DIR = Path(__file__).resolve().parent.parent / "backtest_output"
 
 
-def extract_trades(ticker: str, result: pd.DataFrame) -> pd.DataFrame:
+def extract_trades(ticker: str, result: pd.DataFrame, verbose: bool = True) -> pd.DataFrame:
     """Walk the bar-level engine output and reconstruct a closed-trade log."""
     trades = []
     open_dir = open_date = open_price = open_idx = None
@@ -62,7 +62,7 @@ def extract_trades(ticker: str, result: pd.DataFrame) -> pd.DataFrame:
 
     trades_df = pd.DataFrame(trades)
 
-    if open_dir is not None:
+    if open_dir is not None and verbose:
         print(f"  [{ticker}] note: trade still open at end of data ({open_dir} from {open_date.date()}), excluded from stats")
 
     return trades_df

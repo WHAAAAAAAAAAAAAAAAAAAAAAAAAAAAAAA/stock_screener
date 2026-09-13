@@ -1,7 +1,16 @@
 {
-  "generated_at": "2026-09-13T15:23:43.196627+00:00",
-  "universe_size": 159,
-  "screener_pass_count": 50,
+  "generated_at": "2026-09-13T15:43:16.697949+00:00",
+  "universe_size": 123,
+  "screener_pass_count": 35,
+  "track_record": {
+    "wins": 74,
+    "losses": 102,
+    "flat": 13,
+    "total": 189,
+    "win_rate": 42.0,
+    "avg_pct": 0.89,
+    "months": 12
+  },
   "signals": [
     {
       "ticker": "AAPL",
@@ -42,7 +51,8 @@
         "trend_bear": false,
         "macd_bear": false,
         "rsi_in_zone": false
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "ABBV",
@@ -83,7 +93,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "BAC",
@@ -124,48 +135,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
-    },
-    {
-      "ticker": "BBVA",
-      "as_of": "2026-09-11",
-      "price": 29.549999237060547,
-      "market_cap": 162845190577.50986,
-      "avg_volume": 1466009.5238095238,
-      "relative_volume": 0.6679356334981258,
-      "beta": 1.0029213170782616,
-      "trend200": "BULL",
-      "weekly_warming_up": false,
-      "weekly_state": "BULL",
-      "ema_cloud_state": "BULL",
-      "macd_state": "BEAR",
-      "adx": 26.9,
-      "rsi": 62.3,
-      "stoch_k": 91.4,
-      "bb_squeeze": false,
-      "bear_divergence": true,
-      "bull_divergence": false,
-      "atr": 0.44,
-      "stop_price": 27.6,
-      "trade_status": "LONG LIVE",
-      "signal_count": 0,
-      "entered_long_today": false,
-      "entered_short_today": false,
-      "exited_today": false,
-      "long_readiness": 3,
-      "long_conditions": {
-        "weekly_bull": true,
-        "trend_bull": true,
-        "macd_bull": false,
-        "rsi_in_zone": true
       },
-      "short_readiness": 1,
-      "short_conditions": {
-        "weekly_bear": false,
-        "trend_bear": false,
-        "macd_bear": true,
-        "rsi_in_zone": false
-      }
+      "closed_today": null
     },
     {
       "ticker": "BNY",
@@ -206,48 +177,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
-    },
-    {
-      "ticker": "CNQ",
-      "as_of": "2026-09-11",
-      "price": 50.06999969482422,
-      "market_cap": 104023288112.64038,
-      "avg_volume": 8087020.634920635,
-      "relative_volume": 1.0106070416970325,
-      "beta": 0.4462956393917176,
-      "trend200": "BULL",
-      "weekly_warming_up": false,
-      "weekly_state": "BULL",
-      "ema_cloud_state": "BULL",
-      "macd_state": "BEAR",
-      "adx": 18.3,
-      "rsi": 54.2,
-      "stoch_k": 39.5,
-      "bb_squeeze": false,
-      "bear_divergence": true,
-      "bull_divergence": false,
-      "atr": 1.29,
-      "stop_price": 45.45,
-      "trade_status": "LONG LIVE",
-      "signal_count": 0,
-      "entered_long_today": false,
-      "entered_short_today": false,
-      "exited_today": false,
-      "long_readiness": 3,
-      "long_conditions": {
-        "weekly_bull": true,
-        "trend_bull": true,
-        "macd_bull": false,
-        "rsi_in_zone": true
       },
-      "short_readiness": 2,
-      "short_conditions": {
-        "weekly_bear": false,
-        "trend_bear": false,
-        "macd_bear": true,
-        "rsi_in_zone": true
-      }
+      "closed_today": null
     },
     {
       "ticker": "COP",
@@ -288,7 +219,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": false
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "CRM",
@@ -329,7 +261,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": false
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "CVX",
@@ -370,7 +303,8 @@
         "trend_bear": false,
         "macd_bear": false,
         "rsi_in_zone": false
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "DE",
@@ -411,7 +345,8 @@
         "trend_bear": false,
         "macd_bear": false,
         "rsi_in_zone": false
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "DIS",
@@ -452,48 +387,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
-    },
-    {
-      "ticker": "EQNR",
-      "as_of": "2026-09-11",
-      "price": 44.79999923706055,
-      "market_cap": 102980354715.16228,
-      "avg_volume": 3459355.5555555555,
-      "relative_volume": 0.8585703181710145,
-      "beta": 0.04831864020172187,
-      "trend200": "BULL",
-      "weekly_warming_up": false,
-      "weekly_state": "BULL",
-      "ema_cloud_state": "BULL",
-      "macd_state": "BULL",
-      "adx": 22.0,
-      "rsi": 64.1,
-      "stoch_k": 84.5,
-      "bb_squeeze": false,
-      "bear_divergence": false,
-      "bull_divergence": false,
-      "atr": 1.13,
-      "stop_price": 39.96,
-      "trade_status": "LONG LIVE",
-      "signal_count": 0,
-      "entered_long_today": false,
-      "entered_short_today": false,
-      "exited_today": false,
-      "long_readiness": 4,
-      "long_conditions": {
-        "weekly_bull": true,
-        "trend_bull": true,
-        "macd_bull": true,
-        "rsi_in_zone": true
       },
-      "short_readiness": 0,
-      "short_conditions": {
-        "weekly_bear": false,
-        "trend_bear": false,
-        "macd_bear": false,
-        "rsi_in_zone": false
-      }
+      "closed_today": null
     },
     {
       "ticker": "GILD",
@@ -534,48 +429,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
-    },
-    {
-      "ticker": "ING",
-      "as_of": "2026-09-11",
-      "price": 37.27000045776367,
-      "market_cap": 104524299706.53488,
-      "avg_volume": 2712866.6666666665,
-      "relative_volume": 0.6126360799154646,
-      "beta": 1.0307663293528824,
-      "trend200": "BULL",
-      "weekly_warming_up": false,
-      "weekly_state": "BULL",
-      "ema_cloud_state": "BULL",
-      "macd_state": "BULL",
-      "adx": 24.9,
-      "rsi": 68.3,
-      "stoch_k": 90.7,
-      "bb_squeeze": false,
-      "bear_divergence": false,
-      "bull_divergence": false,
-      "atr": 0.53,
-      "stop_price": 33.71,
-      "trade_status": "LONG LIVE",
-      "signal_count": 0,
-      "entered_long_today": false,
-      "entered_short_today": false,
-      "exited_today": false,
-      "long_readiness": 4,
-      "long_conditions": {
-        "weekly_bull": true,
-        "trend_bull": true,
-        "macd_bull": true,
-        "rsi_in_zone": true
       },
-      "short_readiness": 0,
-      "short_conditions": {
-        "weekly_bear": false,
-        "trend_bear": false,
-        "macd_bear": false,
-        "rsi_in_zone": false
-      }
+      "closed_today": null
     },
     {
       "ticker": "JNJ",
@@ -616,7 +471,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "KO",
@@ -657,7 +513,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "MA",
@@ -698,7 +555,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "MCK",
@@ -739,7 +597,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "MDT",
@@ -780,7 +639,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "MPC",
@@ -821,7 +681,8 @@
         "trend_bear": false,
         "macd_bear": false,
         "rsi_in_zone": false
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "MRK",
@@ -862,7 +723,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "NEM",
@@ -903,7 +765,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "NOW",
@@ -944,48 +807,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
-    },
-    {
-      "ticker": "PBR",
-      "as_of": "2026-09-11",
-      "price": 21.200000762939453,
-      "market_cap": 136620572193.86136,
-      "avg_volume": 17606114.285714287,
-      "relative_volume": 1.0360037259783126,
-      "beta": 0.36942439426798007,
-      "trend200": "BULL",
-      "weekly_warming_up": false,
-      "weekly_state": "BULL",
-      "ema_cloud_state": "BULL",
-      "macd_state": "BULL",
-      "adx": 26.8,
-      "rsi": 67.0,
-      "stoch_k": 90.4,
-      "bb_squeeze": false,
-      "bear_divergence": false,
-      "bull_divergence": false,
-      "atr": 0.63,
-      "stop_price": 19.54,
-      "trade_status": "LONG LIVE",
-      "signal_count": 0,
-      "entered_long_today": false,
-      "entered_short_today": false,
-      "exited_today": false,
-      "long_readiness": 4,
-      "long_conditions": {
-        "weekly_bull": true,
-        "trend_bull": true,
-        "macd_bull": true,
-        "rsi_in_zone": true
       },
-      "short_readiness": 0,
-      "short_conditions": {
-        "weekly_bear": false,
-        "trend_bear": false,
-        "macd_bear": false,
-        "rsi_in_zone": false
-      }
+      "closed_today": null
     },
     {
       "ticker": "PFE",
@@ -1026,7 +849,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "PSX",
@@ -1067,7 +891,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": false
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "T",
@@ -1108,7 +933,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": false
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "TMO",
@@ -1149,89 +975,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
-    },
-    {
-      "ticker": "TTE",
-      "as_of": "2026-09-11",
-      "price": 91.88999938964844,
-      "market_cap": 203062376079.94952,
-      "avg_volume": 1662793.650793651,
-      "relative_volume": 0.7303371644583604,
-      "beta": 0.2839683974731096,
-      "trend200": "BULL",
-      "weekly_warming_up": false,
-      "weekly_state": "BULL",
-      "ema_cloud_state": "BULL",
-      "macd_state": "BULL",
-      "adx": 18.3,
-      "rsi": 63.2,
-      "stoch_k": 99.5,
-      "bb_squeeze": false,
-      "bear_divergence": false,
-      "bull_divergence": false,
-      "atr": 1.61,
-      "stop_price": 86.1,
-      "trade_status": "LONG LIVE",
-      "signal_count": 0,
-      "entered_long_today": false,
-      "entered_short_today": false,
-      "exited_today": false,
-      "long_readiness": 4,
-      "long_conditions": {
-        "weekly_bull": true,
-        "trend_bull": true,
-        "macd_bull": true,
-        "rsi_in_zone": true
       },
-      "short_readiness": 0,
-      "short_conditions": {
-        "weekly_bear": false,
-        "trend_bear": false,
-        "macd_bear": false,
-        "rsi_in_zone": false
-      }
-    },
-    {
-      "ticker": "UBS",
-      "as_of": "2026-09-11",
-      "price": 54.58000183105469,
-      "market_cap": 169559283481.91342,
-      "avg_volume": 1762971.4285714286,
-      "relative_volume": 0.8477165175677427,
-      "beta": 1.0536678602705223,
-      "trend200": "BULL",
-      "weekly_warming_up": false,
-      "weekly_state": "BULL",
-      "ema_cloud_state": "BULL",
-      "macd_state": "BEAR",
-      "adx": 20.9,
-      "rsi": 53.7,
-      "stoch_k": 50.0,
-      "bb_squeeze": false,
-      "bear_divergence": false,
-      "bull_divergence": false,
-      "atr": 0.88,
-      "stop_price": 52.81,
-      "trade_status": "LONG LIVE",
-      "signal_count": 0,
-      "entered_long_today": true,
-      "entered_short_today": false,
-      "exited_today": false,
-      "long_readiness": 3,
-      "long_conditions": {
-        "weekly_bull": true,
-        "trend_bull": true,
-        "macd_bull": false,
-        "rsi_in_zone": true
-      },
-      "short_readiness": 2,
-      "short_conditions": {
-        "weekly_bear": false,
-        "trend_bear": false,
-        "macd_bear": true,
-        "rsi_in_zone": true
-      }
+      "closed_today": null
     },
     {
       "ticker": "VLO",
@@ -1272,7 +1017,8 @@
         "trend_bear": false,
         "macd_bear": false,
         "rsi_in_zone": false
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "VZ",
@@ -1313,7 +1059,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": false
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "XOM",
@@ -1354,7 +1101,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": false
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "ADP",
@@ -1395,7 +1143,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "BMY",
@@ -1436,48 +1185,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
-    },
-    {
-      "ticker": "BP",
-      "as_of": "2026-09-11",
-      "price": 46.099998474121094,
-      "market_cap": 112825749173.97444,
-      "avg_volume": 9148777.777777778,
-      "relative_volume": 0.6155467032633382,
-      "beta": 0.37822868746130234,
-      "trend200": "BULL",
-      "weekly_warming_up": false,
-      "weekly_state": "BULL",
-      "ema_cloud_state": "BULL",
-      "macd_state": "BULL",
-      "adx": 18.3,
-      "rsi": 64.8,
-      "stoch_k": 94.0,
-      "bb_squeeze": false,
-      "bear_divergence": false,
-      "bull_divergence": false,
-      "atr": 0.99,
-      "stop_price": null,
-      "trade_status": "FLAT",
-      "signal_count": 0,
-      "entered_long_today": false,
-      "entered_short_today": false,
-      "exited_today": false,
-      "long_readiness": 4,
-      "long_conditions": {
-        "weekly_bull": true,
-        "trend_bull": true,
-        "macd_bull": true,
-        "rsi_in_zone": true
       },
-      "short_readiness": 0,
-      "short_conditions": {
-        "weekly_bear": false,
-        "trend_bear": false,
-        "macd_bear": false,
-        "rsi_in_zone": false
-      }
+      "closed_today": null
     },
     {
       "ticker": "BRK-B",
@@ -1518,48 +1227,8 @@
         "trend_bear": false,
         "macd_bear": false,
         "rsi_in_zone": true
-      }
-    },
-    {
-      "ticker": "HSBC",
-      "as_of": "2026-09-11",
-      "price": 105.30000305175781,
-      "market_cap": 366959587118.65857,
-      "avg_volume": 1252885.7142857143,
-      "relative_volume": 0.7626393924881987,
-      "beta": 0.9482612198513685,
-      "trend200": "BULL",
-      "weekly_warming_up": false,
-      "weekly_state": "BULL",
-      "ema_cloud_state": "BULL",
-      "macd_state": "BEAR",
-      "adx": 11.7,
-      "rsi": 55.4,
-      "stoch_k": 58.7,
-      "bb_squeeze": false,
-      "bear_divergence": false,
-      "bull_divergence": false,
-      "atr": 1.53,
-      "stop_price": null,
-      "trade_status": "FLAT",
-      "signal_count": 0,
-      "entered_long_today": false,
-      "entered_short_today": false,
-      "exited_today": false,
-      "long_readiness": 3,
-      "long_conditions": {
-        "weekly_bull": true,
-        "trend_bull": true,
-        "macd_bull": false,
-        "rsi_in_zone": true
       },
-      "short_readiness": 2,
-      "short_conditions": {
-        "weekly_bear": false,
-        "trend_bear": false,
-        "macd_bear": true,
-        "rsi_in_zone": true
-      }
+      "closed_today": null
     },
     {
       "ticker": "JPM",
@@ -1600,89 +1269,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
-    },
-    {
-      "ticker": "MFG",
-      "as_of": "2026-09-11",
-      "price": 11.449999809265137,
-      "market_cap": 133859763406.04285,
-      "avg_volume": 3656353.9682539683,
-      "relative_volume": 1.1064300762794752,
-      "beta": 1.131994799343684,
-      "trend200": "BULL",
-      "weekly_warming_up": false,
-      "weekly_state": "BULL",
-      "ema_cloud_state": "BULL",
-      "macd_state": "BULL",
-      "adx": 18.3,
-      "rsi": 65.9,
-      "stoch_k": 96.9,
-      "bb_squeeze": false,
-      "bear_divergence": false,
-      "bull_divergence": false,
-      "atr": 0.24,
-      "stop_price": null,
-      "trade_status": "FLAT",
-      "signal_count": 0,
-      "entered_long_today": false,
-      "entered_short_today": false,
-      "exited_today": false,
-      "long_readiness": 4,
-      "long_conditions": {
-        "weekly_bull": true,
-        "trend_bull": true,
-        "macd_bull": true,
-        "rsi_in_zone": true
       },
-      "short_readiness": 0,
-      "short_conditions": {
-        "weekly_bear": false,
-        "trend_bear": false,
-        "macd_bear": false,
-        "rsi_in_zone": false
-      }
-    },
-    {
-      "ticker": "MUFG",
-      "as_of": "2026-09-11",
-      "price": 23.889999389648438,
-      "market_cap": 260458389630.1464,
-      "avg_volume": 3115480.9523809524,
-      "relative_volume": 1.0944377616541663,
-      "beta": 0.9976488510767361,
-      "trend200": "BULL",
-      "weekly_warming_up": false,
-      "weekly_state": "BULL",
-      "ema_cloud_state": "BULL",
-      "macd_state": "BULL",
-      "adx": 16.8,
-      "rsi": 61.9,
-      "stoch_k": 84.9,
-      "bb_squeeze": false,
-      "bear_divergence": true,
-      "bull_divergence": false,
-      "atr": 0.48,
-      "stop_price": null,
-      "trade_status": "FLAT",
-      "signal_count": 0,
-      "entered_long_today": false,
-      "entered_short_today": false,
-      "exited_today": false,
-      "long_readiness": 4,
-      "long_conditions": {
-        "weekly_bull": true,
-        "trend_bull": true,
-        "macd_bull": true,
-        "rsi_in_zone": true
-      },
-      "short_readiness": 0,
-      "short_conditions": {
-        "weekly_bear": false,
-        "trend_bear": false,
-        "macd_bear": false,
-        "rsi_in_zone": false
-      }
+      "closed_today": null
     },
     {
       "ticker": "PGR",
@@ -1723,7 +1311,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "PM",
@@ -1764,89 +1353,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
-    },
-    {
-      "ticker": "RIO",
-      "as_of": "2026-09-11",
-      "price": 99.95999908447266,
-      "market_cap": 161643846952.03906,
-      "avg_volume": 2520938.095238095,
-      "relative_volume": 0.5593155986905857,
-      "beta": 0.859798621081237,
-      "trend200": "BULL",
-      "weekly_warming_up": false,
-      "weekly_state": "BULL",
-      "ema_cloud_state": "BULL",
-      "macd_state": "BEAR",
-      "adx": 19.9,
-      "rsi": 46.7,
-      "stoch_k": 13.4,
-      "bb_squeeze": false,
-      "bear_divergence": false,
-      "bull_divergence": false,
-      "atr": 2.27,
-      "stop_price": null,
-      "trade_status": "FLAT",
-      "signal_count": 0,
-      "entered_long_today": false,
-      "entered_short_today": false,
-      "exited_today": false,
-      "long_readiness": 3,
-      "long_conditions": {
-        "weekly_bull": true,
-        "trend_bull": true,
-        "macd_bull": false,
-        "rsi_in_zone": true
       },
-      "short_readiness": 2,
-      "short_conditions": {
-        "weekly_bear": false,
-        "trend_bear": false,
-        "macd_bear": true,
-        "rsi_in_zone": true
-      }
-    },
-    {
-      "ticker": "SAP",
-      "as_of": "2026-09-11",
-      "price": 206.36000061035156,
-      "market_cap": 241390272376.00964,
-      "avg_volume": 2757995.238095238,
-      "relative_volume": 0.6237139122792781,
-      "beta": 0.7686582301814555,
-      "trend200": "BULL",
-      "weekly_warming_up": false,
-      "weekly_state": "BULL",
-      "ema_cloud_state": "BULL",
-      "macd_state": "BEAR",
-      "adx": 30.6,
-      "rsi": 49.9,
-      "stoch_k": 13.4,
-      "bb_squeeze": false,
-      "bear_divergence": false,
-      "bull_divergence": false,
-      "atr": 5.97,
-      "stop_price": null,
-      "trade_status": "FLAT",
-      "signal_count": 0,
-      "entered_long_today": false,
-      "entered_short_today": false,
-      "exited_today": false,
-      "long_readiness": 3,
-      "long_conditions": {
-        "weekly_bull": true,
-        "trend_bull": true,
-        "macd_bull": false,
-        "rsi_in_zone": true
-      },
-      "short_readiness": 2,
-      "short_conditions": {
-        "weekly_bear": false,
-        "trend_bear": false,
-        "macd_bear": true,
-        "rsi_in_zone": true
-      }
+      "closed_today": null
     },
     {
       "ticker": "SCHW",
@@ -1887,89 +1395,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
-    },
-    {
-      "ticker": "SPOT",
-      "as_of": "2026-09-11",
-      "price": 525.75,
-      "market_cap": 107520539215.0,
-      "avg_volume": 1768471.4285714286,
-      "relative_volume": 0.5757514560597126,
-      "beta": 0.7376740258950006,
-      "trend200": "BULL",
-      "weekly_warming_up": false,
-      "weekly_state": "BULL",
-      "ema_cloud_state": "BULL",
-      "macd_state": "BEAR",
-      "adx": 11.6,
-      "rsi": 50.2,
-      "stoch_k": 26.3,
-      "bb_squeeze": false,
-      "bear_divergence": true,
-      "bull_divergence": false,
-      "atr": 19.13,
-      "stop_price": null,
-      "trade_status": "FLAT",
-      "signal_count": 0,
-      "entered_long_today": false,
-      "entered_short_today": false,
-      "exited_today": false,
-      "long_readiness": 3,
-      "long_conditions": {
-        "weekly_bull": true,
-        "trend_bull": true,
-        "macd_bull": false,
-        "rsi_in_zone": true
       },
-      "short_readiness": 2,
-      "short_conditions": {
-        "weekly_bear": false,
-        "trend_bear": false,
-        "macd_bear": true,
-        "rsi_in_zone": true
-      }
-    },
-    {
-      "ticker": "TD",
-      "as_of": "2026-09-11",
-      "price": 120.97000122070312,
-      "market_cap": 199278222610.00824,
-      "avg_volume": 2440611.111111111,
-      "relative_volume": 0.8018073797546152,
-      "beta": 0.505211186500065,
-      "trend200": "BULL",
-      "weekly_warming_up": false,
-      "weekly_state": "BULL",
-      "ema_cloud_state": "BULL",
-      "macd_state": "BEAR",
-      "adx": 13.5,
-      "rsi": 51.6,
-      "stoch_k": 68.0,
-      "bb_squeeze": false,
-      "bear_divergence": true,
-      "bull_divergence": false,
-      "atr": 2.08,
-      "stop_price": null,
-      "trade_status": "FLAT",
-      "signal_count": 0,
-      "entered_long_today": false,
-      "entered_short_today": false,
-      "exited_today": false,
-      "long_readiness": 3,
-      "long_conditions": {
-        "weekly_bull": true,
-        "trend_bull": true,
-        "macd_bull": false,
-        "rsi_in_zone": true
-      },
-      "short_readiness": 2,
-      "short_conditions": {
-        "weekly_bear": false,
-        "trend_bear": false,
-        "macd_bear": true,
-        "rsi_in_zone": true
-      }
+      "closed_today": null
     },
     {
       "ticker": "VRTX",
@@ -2010,7 +1437,8 @@
         "trend_bear": false,
         "macd_bear": true,
         "rsi_in_zone": true
-      }
+      },
+      "closed_today": null
     },
     {
       "ticker": "WFC",
@@ -2051,7 +1479,8 @@
         "trend_bear": false,
         "macd_bear": false,
         "rsi_in_zone": false
-      }
+      },
+      "closed_today": null
     }
   ]
 }
