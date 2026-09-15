@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-15T23:00:29.541700+00:00",
+  "generated_at": "2026-09-15T23:04:23.301404+00:00",
   "universe_size": 118,
   "screener_pass_count": 39,
   "track_record": {
@@ -1570,7 +1570,7 @@
       "ticker": "VRTX",
       "as_of": "2026-09-15",
       "price": 514.6300048828125,
-      "market_cap": 130438596555.72217,
+      "market_cap": 130438596555.72215,
       "avg_volume": 1457990.650793651,
       "relative_volume": 0.5568012384428489,
       "beta": 0.4847860610564298,
